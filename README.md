@@ -35,7 +35,7 @@ fastboot reboot
 ```    
 ## 刷webpad官改系统
 安装好Usb burning tools 工具
-加载n1wepad官方系统镜像，点击开始按钮***（取消默认的擦除flash和解除bootloader）***
+加载n1wepad官方系统镜像，点击开始按钮**取消默认的擦除flash和解除bootloader**
 连接双头USB线，n1尽量接在靠近hdmi口的usb口上
 打开adb
 ```
@@ -45,7 +45,7 @@ adb connect 盒子IP地址
 adb shell reboot update
 ```
 等待固件烧录完成，点击停止，拔掉电源后重新上电开机。
-## 刷armbain系统
+## 刷armbian系统
 
 下载好自己喜欢的系统文件，server为没有桌面的服务器版，其他的都是带了桌面的，桌面占用内存对比： mate > xfce > icewm
 这里选择Armbian_5.44_S9xxx_Ubuntu_xenial_3.14.29_server_20180515.img.xz
@@ -60,7 +60,7 @@ xzcat Armbian_5.44_S9xxx_Ubuntu_xenial_3.14.29_server_20180515.img.xz | dd of=/d
 gzip -dc CoreELEC-PhiComm_N1.arm-8.95.0.img.gz | dd of=/dev/sdd
 ```
 ## 进入系统
-把U盘插入n1
+
 使用adb命令重启N1
 ```
 adb connect N1的IP
@@ -71,11 +71,13 @@ adb shell reboot update
 su
 reboot update
 ```
+进入recovery模式后再插入制作好的U盘，点击reboot to system。
+###这里有个坑：U盘制作好后千万别插在正在运行的Android系统下，要不会被更改权限，导致后面armbian出现问题
+如果U盘制作没问题，重启后就可以armbian系统了，默认armbian的root密码是1234，第一次需要重新设置armbian密码之后才能登入系统。
 
-如果U盘制作没问题，重启后就可以armbain系统了，默认armbain的root密码是1234，第一次需要重新设置armbain密码之后才能登入系统。
-coreelec系统的ssh，用户名：root、coreelec系统：coreelec
+Coreelec系统的ssh用户名：root、密码：coreelec
 
-这样是通过U盘启动的，速度不够快也比较麻烦，我们还需要将armbain、coreelec刷到自带的eMMC里面去。
+这样是通过U盘启动的，速度不够快也比较麻烦，我们还需要将armbian、coreelec刷到自带的eMMC里面去。
 
 ## 将系统写入eMMC存储
 ### armbian系统
@@ -92,8 +94,21 @@ gunzip install.sh.gz
 chmod +x install.sh
 nand-sata-install
 ```
+重新切换到Android系统：
+```
+mv /boot/s905_autoscript /boot/s905_autoscriptbak
+reboot
+```
+重启后就会自动进入Android系统
 ### coreelec系统:
 若要写入eMMC，开启ssh，用户名、密码：root、coreelec，登录后执行installtointernal，按屏幕提示操作完成。
 
 如果没有报错的运行完成就可以拔掉U盘重启系统了
 
+### 错误重刷
+如果内置的armbian被破坏了，可以根据上面的步骤重刷启动U盘，
+用U盘启动之后，运行命令：（注意:这样 data 分区上的数据会全部丢失，但是Android系统还是在的）
+```
+mke2fs -F -q -t ext4 -m 0 -O ^64bit,^metadata_csum /dev/data
+```
+完成后就可以全新安装armbian到emmc了
