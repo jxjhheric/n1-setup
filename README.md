@@ -5,7 +5,7 @@
 + HDMI 数据线一根
 + U盘一个
 + USB鼠标一个
-+ adb工具。
++ adb工具
 + 降级固件：[微云链接](https://share.weiyun.com/5vAkZ7p) 密码：nzwy53. 注意下载N1版本的！注意下载N1版本的！注意下载N1版本的！[帖子](http://www.right.com.cn/forum/thread-322736-1-1.html)
 + webpad官改系统 [微云链接](https://share.weiyun.com/5wenYgZ) 密码：faewbc N1_mod_by_webpad_v2.0_20180601-sf-gms-xposed-2.img -> 沙发桌面 和 Lighthome桌面，沙发桌面v2.0_20180601 修正版无需打补丁patch1，但是首次启动后xposed框架处于未激活状态，请手动激活；
 + armbain 镜像： [下载地址](https://yadi.sk/d/pHxaRAs-tZiei)
@@ -71,9 +71,9 @@ adb shell reboot update
 su
 reboot update
 ```
-进入recovery模式后再插入制作好的U盘，点击reboot to system。
-###这里有个坑：U盘制作好后千万别插在正在运行的Android系统下，要不会被更改权限，导致后面armbian出现问题
-如果U盘制作没问题，重启后就可以armbian系统了，默认armbian的root密码是1234，第一次需要重新设置armbian密码之后才能登入系统。
+进入recovery模式后再插入制作好的U盘，点击reboot to system
+### 这里有个坑：U盘制作好后千万别插在正在运行的Android系统下，要不会被更改权限，导致后面armbian出现问题
+如果U盘制作没问题，重启后就可以armbian系统了，默认armbian的root密码是1234，第一次需要重新设置armbian密码之后才能登入系统
 
 Coreelec系统的ssh用户名：root、密码：coreelec
 
