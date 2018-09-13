@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
+. /etc/profile
+oe_setup_addon service.emby
+
+EMBY_TEMP="/storage/.kodi/temp"
+
+# set version to use
+if [ -z "$1" ]; then
+# if no input
+  echo -e "\nUsage:"
+  echo -e "${0##*/} 3.6.0.1"
+  echo -e "${0##*/} stable"
+  echo -e "\n====== last releases ======"
+  curl --silent "https://api.github.com/repos/MediaBrowser/Emby.Releases/releases" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | head -n 20
+  echo -e "==========================="
+  exit 0
+
+# if input = stable
+elif [ "$1" = "stable" ]; then
+  EMBY_VERSION=$(curl --silent "https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+  echo "latest stable is $EMBY_VERSION"
+  read -p "continue (y/n)? " EMBY_CONT
+  if [ $EMBY_CONT = "Y" ] || [ $EMBY_CONT = "y" ]; then
+    echo ""
+  else
+    exit 0
+  fi
+
+# if input = 1.2.3.4
+else
+  EMBY_VERSION="$1"
+fi
+
+echo "1. stopping Emby service" && sleep 1
+  systemctl stop service.emby
+
+echo "2. download Emby version $EMBY_VERSION" && sleep 1
+  rm -f $EMBY_TEMP/embyserver-netcore_*.zip
+  rm -f $EMBY_TEMP/EmbyServer.runtimeconfig.json
+  curl --progress-bar --fail -L -o $EMBY_TEMP/embyserver-netcore_$EMBY_VERSION.zip https://github.com/MediaBrowser/Emby.Releases/releases/download/$EMBY_VERSION/embyserver-netcore_$EMBY_VERSION.zip || exit 1
+
+echo "3. removing old install" && sleep 1
+  cp $ADDON_DIR/emby/EmbyServer.runtimeconfig.json $EMBY_TEMP
+  rm -rf $ADDON_DIR/emby
+
+echo "4. extracting Emby" && sleep 1
+  unzip -q $EMBY_TEMP/embyserver-netcore_$EMBY_VERSION.zip -d $ADDON_DIR
+  mv $ADDON_DIR/system $ADDON_DIR/emby
+  cp -rf $EMBY_TEMP/EmbyServer.runtimeconfig.json $ADDON_DIR/emby
+
+echo "5. restarting Emby service" && sleep 1
+  systemctl start service.emby
+
+echo "... done"
+exit 0
